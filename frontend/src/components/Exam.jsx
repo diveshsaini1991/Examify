@@ -69,7 +69,8 @@ const Exam = () => {
         setIsSubmitting(true);
         try {
             const token = localStorage.getItem('token');
-            await axios.post('http://localhost:5000/api/exams/submit', 
+            const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+            await axios.post(VITE_BACKEND_URL + '/api/exams/submit', 
                 { examId: id, answers }, 
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -105,7 +106,8 @@ const Exam = () => {
         const fetchExam = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get(`http://localhost:5000/api/exams/${id}`, {
+                const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+                const response = await axios.get(VITE_BACKEND_URL + `/api/exams/${id}`, {
                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
                 });
                 
@@ -158,7 +160,8 @@ const Exam = () => {
         setIsSubmitting(true);
         try {
             const token = localStorage.getItem('token');
-            await axios.post('http://localhost:5000/api/exams/submit', 
+            const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+            await axios.post(VITE_BACKEND_URL + '/api/exams/submit', 
                 { examId: id, answers }, 
                 { headers: { Authorization: `Bearer ${token}` } }
             );

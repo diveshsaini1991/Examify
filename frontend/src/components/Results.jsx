@@ -11,7 +11,8 @@ const Results = () => {
       try {
         setLoading(true);
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/api/results', {
+        const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+        const response = await fetch(VITE_BACKEND_URL + '/api/results', {
           headers: { Authorization: `Bearer ${token}` }
         });
         
@@ -21,6 +22,7 @@ const Results = () => {
         
         const data = await response.json();
         setResults(data);
+        console.log(data);
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -34,7 +36,8 @@ const Results = () => {
   const downloadCertificate = async (resultId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/results/certificate/${resultId}`, {
+      const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+      const response = await fetch(VITE_BACKEND_URL + `/api/results/certificate/${resultId}`, {
         method: 'GET',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -116,7 +119,7 @@ const Results = () => {
                 <div className="p-6">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h2 className="text-xl font-semibold text-gray-800">{result.exam.title}</h2>
+                      <h2 className="text-xl font-semibold text-gray-800">{result.exam?.title}</h2>
                       <p className="text-gray-500 text-sm mt-1">
                         Completed on {new Date(result.createdAt || Date.now()).toLocaleDateString()}
                       </p>
@@ -135,8 +138,8 @@ const Results = () => {
                   <div className="mt-6">
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-gray-600 font-medium">Score</span>
-                      <span className={`font-bold text-lg ${getScoreColor((result.score/result.exam.questions.length)*100)}`}>
-                        {(result.score/result.exam.questions.length)*100}%
+                      <span className={`font-bold text-lg ${getScoreColor((result.score/result.exam?.questions.length)*100)}`}>
+                        {(result.score/result.exam?.questions.length)*100}%
                       </span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2.5">
@@ -144,7 +147,7 @@ const Results = () => {
                         className={`h-2.5 rounded-full ${
                           result.passed ? 'bg-green-600' : 'bg-red-600'
                         }`}
-                        style={{ width: `${(result.score/result.exam.questions.length)*100}%` }}
+                        style={{ width: `${(result.score/result.exam?.questions.length)*100}%` }}
                       ></div>
                     </div>
                   </div>

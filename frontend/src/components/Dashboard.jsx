@@ -17,7 +17,8 @@ const Dashboard = () => {
         const token = localStorage.getItem('token');
         try {
             setLoading(true);
-            const response = await axios.get('http://localhost:5000/api/exams', {
+            const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+            const response = await axios.get(VITE_BACKEND_URL + '/api/exams', {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setExams(response.data);
@@ -39,7 +40,8 @@ const Dashboard = () => {
         setDeleteLoading(examId);
         
         try {
-            await axios.delete(`http://localhost:5000/api/exams/delete/${examId}`, {
+            const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+            await axios.delete(VITE_BACKEND_URL + `/api/exams/delete/${examId}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             

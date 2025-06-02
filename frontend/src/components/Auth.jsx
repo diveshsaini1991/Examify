@@ -17,7 +17,8 @@ const Auth = () => {
         const endpoint = isRegistering ? '/register' : '/login';
 
         try {
-            const response = await axios.post(`http://localhost:5000/api/auth${endpoint}`, { username, password, role });
+            const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+            const response = await axios.post(VITE_BACKEND_URL + `/api/auth${endpoint}`, { username, password, role });
             
             if (isRegistering) {
                 setSuccessMessage('Registration successful! You can now log in.');

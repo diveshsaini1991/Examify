@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
 import CreateExam from './components/CreateExam';
@@ -8,6 +8,7 @@ import Navbar from './components/Navbar';
 import Auth from './components/Auth';
 import Home from './components/Home'
 import { Footer } from './components/Footer';
+
 
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('token');
@@ -45,6 +46,12 @@ const ExaminerRoute = ({ children }) => {
 };
 
 const App = () => {
+
+  useEffect(() => {
+    const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL
+    fetch( VITE_BACKEND_URL + '/ping');
+  }, []);
+
   return (
     <Router>
       <Navbar />
