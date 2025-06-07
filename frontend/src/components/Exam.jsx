@@ -18,6 +18,7 @@ const Exam = () => {
     const role = localStorage.getItem('role');
     const examContainerRef = useRef(null);
     const autoSubmitLock = useRef(false);
+    const [examStarted, setExamStarted] = useState(false);
     
     // Check if browser is in fullscreen
     const isFullscreen = () => {
@@ -115,16 +116,12 @@ const Exam = () => {
                 setAnswers(Array(response.data.questions.length).fill(''));
                 setError(null);
 
-                // Request fullscreen when exam starts
-                requestFullscreen();
-                
                 // Set up event listeners
                 document.addEventListener('visibilitychange', handleVisibilityChange);
                 document.addEventListener('fullscreenchange', checkFullscreen);
                 document.addEventListener('webkitfullscreenchange', checkFullscreen);
                 document.addEventListener('mozfullscreenchange', checkFullscreen);
                 document.addEventListener('MSFullscreenChange', checkFullscreen);
-
 
                 return () => {
                     document.removeEventListener('visibilitychange', handleVisibilityChange);
@@ -196,108 +193,131 @@ const Exam = () => {
     
     return (
         <div className="h-screen overflow-auto" ref={examContainerRef}>
-            {warning && (
-                <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative mb-4 sticky top-0 z-10">
-                    <p>{warning}</p>
-                </div>
-            )}
-            
-            {showFullscreenPopup && (
+            {/* Start Exam Modal */}
+            {!examStarted && !loading && !error && (
                 <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
                     <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full">
-                        <h2 className="text-2xl font-bold text-red-600 mb-4">Fullscreen Required</h2>
-                        <p className="text-gray-700 mb-2">
-                            You must be in fullscreen mode to continue the exam.
-                        </p>
-                        <p className="text-gray-700 mb-6">
-                            Warning Count: {tabSwitchCount}/5
-                        </p>
+                        <h2 className="text-2xl font-bold mb-4">Start Exam</h2>
+                        <p className="mb-6">To begin, please enter fullscreen mode.</p>
                         <button
-                            onClick={requestFullscreen}
+                            onClick={async () => {
+                                await requestFullscreen();
+                                setExamStarted(true);
+                            }}
                             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded transition"
                         >
-                            Enter Fullscreen Mode
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {showEndExamPopup && (
-                <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-                    <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full">
-                        <h2 className="text-2xl font-bold text-green-600 mb-4">
-                            {tabSwitchCount >= 5 ? 'Exam Ended' : 'Exam Submitted'}
-                        </h2>
-                        <p className="text-gray-700 mb-6">
-                            {tabSwitchCount >= 5 
-                                ? 'Your exam has been automatically submitted due to multiple warnings.'
-                                : 'Your exam has been successfully submitted.'
-                            }
-                            You can view your results by clicking the button below.
-                        </p>
-                        <button
-                            onClick={() => navigate('/results')}
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded transition"
-                        >
-                            View Results
+                            Enter Fullscreen & Start Exam
                         </button>
                     </div>
                 </div>
             )}
             
-            <div className="container mx-auto px-4 py-6">
-                {exam && (
-                    <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md">
-                        <div className="flex justify-between items-center mb-4 sticky top-0 bg-white py-2">
-                            <h2 className="text-xl font-bold">{exam.title}</h2>
-                            <div className="text-sm text-gray-600">
-                                Warning Count: {tabSwitchCount}/5
-                            </div>
-                        </div>
-                        
-                        <div className="space-y-6">
-                            {exam.questions.map((question, index) => (
-                                <div key={index} className="p-4 border border-gray-200 rounded">
-                                    <p className="font-semibold">{question.question}</p>
-                                    <div className="mt-3 space-y-2">
-                                        {question.options.map((option, optionIndex) => (
-                                            <label key={optionIndex} className="block ml-2 flex items-start">
-                                                <input
-                                                    type="radio"
-                                                    name={`question-${index}`}
-                                                    value={option}
-                                                    checked={answers[index] === option}
-                                                    onChange={() => {
-                                                        const newAnswers = [...answers];
-                                                        newAnswers[index] = option;
-                                                        setAnswers(newAnswers);
-                                                    }}
-                                                    className="mr-2 mt-1"
-                                                />
-                                                <span>{option}</span>
-                                            </label>
-                                        ))}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                        
-                        <div className="mt-6 sticky bottom-0 bg-white py-4">
-                            {role === 'student' && !hasSubmitted ? (
-                                <button 
-                                    type="submit" 
-                                    className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded transition"
-                                    disabled={isSubmitting}
-                                >
-                                    {isSubmitting ? 'Submitting...' : 'Submit Exam'}
-                                </button>
-                            ) : (
-                                <p>Author cannot Attempt</p>
-                            )}
-                        </div>
-                    </form>
+            {examStarted && (
+                <>
+                {warning && (
+                    <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative mb-4 sticky top-0 z-10">
+                        <p>{warning}</p>
+                    </div>
                 )}
-            </div>
+                
+                {showFullscreenPopup && (
+                    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+                        <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full">
+                            <h2 className="text-2xl font-bold text-red-600 mb-4">Fullscreen Required</h2>
+                            <p className="text-gray-700 mb-2">
+                                You must be in fullscreen mode to continue the exam.
+                            </p>
+                            <p className="text-gray-700 mb-6">
+                                Warning Count: {tabSwitchCount}/5
+                            </p>
+                            <button
+                                onClick={requestFullscreen}
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded transition"
+                            >
+                                Enter Fullscreen Mode
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {showEndExamPopup && (
+                    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+                        <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full">
+                            <h2 className="text-2xl font-bold text-green-600 mb-4">
+                                {tabSwitchCount >= 5 ? 'Exam Ended' : 'Exam Submitted'}
+                            </h2>
+                            <p className="text-gray-700 mb-6">
+                                {tabSwitchCount >= 5 
+                                    ? 'Your exam has been automatically submitted due to multiple warnings.'
+                                    : 'Your exam has been successfully submitted.'
+                                }
+                                You can view your results by clicking the button below.
+                            </p>
+                            <button
+                                onClick={() => navigate('/results')}
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded transition"
+                            >
+                                View Results
+                            </button>
+                        </div>
+                    </div>
+                )}
+                
+                <div className="container mx-auto px-4 py-6">
+                    {exam && (
+                        <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md">
+                            <div className="flex justify-between items-center mb-4 sticky top-0 bg-white py-2">
+                                <h2 className="text-xl font-bold">{exam.title}</h2>
+                                <div className="text-sm text-gray-600">
+                                    Warning Count: {tabSwitchCount}/5
+                                </div>
+                            </div>
+                            
+                            <div className="space-y-6">
+                                {exam.questions.map((question, index) => (
+                                    <div key={index} className="p-4 border border-gray-200 rounded">
+                                        <p className="font-semibold">{question.question}</p>
+                                        <div className="mt-3 space-y-2">
+                                            {question.options.map((option, optionIndex) => (
+                                                <label key={optionIndex} className="block ml-2 flex items-start">
+                                                    <input
+                                                        type="radio"
+                                                        name={`question-${index}`}
+                                                        value={option}
+                                                        checked={answers[index] === option}
+                                                        onChange={() => {
+                                                            const newAnswers = [...answers];
+                                                            newAnswers[index] = option;
+                                                            setAnswers(newAnswers);
+                                                        }}
+                                                        className="mr-2 mt-1"
+                                                    />
+                                                    <span>{option}</span>
+                                                </label>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            
+                            <div className="mt-6 sticky bottom-0 bg-white py-4">
+                                {role === 'student' && !hasSubmitted ? (
+                                    <button 
+                                        type="submit" 
+                                        className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded transition"
+                                        disabled={isSubmitting}
+                                    >
+                                        {isSubmitting ? 'Submitting...' : 'Submit Exam'}
+                                    </button>
+                                ) : (
+                                    <p>Author cannot Attempt</p>
+                                )}
+                            </div>
+                        </form>
+                    )}
+                </div>
+                </>
+            )}
         </div>
     );
 };
