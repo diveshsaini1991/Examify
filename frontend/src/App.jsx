@@ -8,10 +8,9 @@ import Navbar from './components/Navbar';
 import Auth from './components/Auth';
 import Home from './components/Home'
 import { Footer } from './components/Footer';
-import Cookies from 'js-cookie';
 
 const ProtectedRoute = ({ children }) => {
-  const isAuthenticated = Cookies.get('token');
+  const isAuthenticated = localStorage.getItem('username');
   if (!isAuthenticated) {
     return <Navigate to="/" />;
   }
@@ -20,7 +19,7 @@ const ProtectedRoute = ({ children }) => {
 };
 
 const PublicRoute = ({ children }) => {
-  const isAuthenticated = Cookies.get('token');
+  const isAuthenticated = localStorage.getItem('username');
 
   if (isAuthenticated) {
     return <Navigate to="/dashboard" />;
@@ -30,7 +29,7 @@ const PublicRoute = ({ children }) => {
 };
 
 const ExaminerRoute = ({ children }) => {
-  const isAuthenticated = Cookies.get('token');
+  const isAuthenticated = localStorage.getItem('username');
   const role = localStorage.getItem('role');
 
   if (!isAuthenticated) {
@@ -93,7 +92,7 @@ const App = () => {
           } />
 
           <Route path="*" element={
-            Cookies.get('token') ?
+            localStorage.getItem('username') ?
               <Navigate to="/dashboard" /> :
               <Navigate to="/" />
           } />

@@ -22,7 +22,7 @@ exports.login = async (req, res) => {
     if (user && await bcrypt.compare(password, user.password)) {
         const token = jwt.sign({ id: user._id, role: user.role, username: user.username }, process.env.JWT_SECRET, { expiresIn: '7d' });
         const cookieOptions = {
-            httpOnly: false,
+            httpOnly: true,
             secure: true,
             sameSite: 'none',
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
@@ -37,7 +37,7 @@ exports.login = async (req, res) => {
 
 exports.logout = async (req, res) => {
     res.clearCookie('token', {
-      httpOnly: false,
+      httpOnly: true,
       secure: true,
       sameSite: 'none',
     });
