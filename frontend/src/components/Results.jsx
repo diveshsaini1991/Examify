@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Download, Award, AlertCircle, CheckCircle, XCircle, Clock } from 'lucide-react';
+import axios from 'axios';
 
 const Results = () => {
   const [results, setResults] = useState([]);
@@ -10,22 +11,12 @@ const Results = () => {
     const fetchResults = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem('token');
         const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-        const response = await fetch(VITE_BACKEND_URL + '/api/results', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch results');
-        }
-        
-        const data = await response.json();
-        setResults(data);
-        console.log(data);
+        const response = await axios.get(VITE_BACKEND_URL + '/api/results', { withCredentials: true });
+        setResults(response.data);
         setLoading(false);
       } catch (err) {
-        setError(err.message);
+        setError(err.response?.data?.message || err.message);
         setLoading(false);
       }
     };
@@ -35,19 +26,12 @@ const Results = () => {
 
   const downloadCertificate = async (resultId) => {
     try {
-      const token = localStorage.getItem('token');
       const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-      const response = await fetch(VITE_BACKEND_URL + `/api/results/certificate/${resultId}`, {
-        method: 'GET',
-        headers: { Authorization: `Bearer ${token}` }
+      const response = await axios.get(VITE_BACKEND_URL + `/api/results/certificate/${resultId}`, {
+        responseType: 'blob',
+        withCredentials: true
       });
-      
-      if (!response.ok) {
-        throw new Error('Failed to download certificate');
-      }
-      
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
+      const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', `certificate-${resultId}.pdf`);

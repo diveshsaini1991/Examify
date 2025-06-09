@@ -20,9 +20,26 @@ exports.login = async (req, res) => {
     const user = await User.findOne({ username });
 
     if (user && await bcrypt.compare(password, user.password)) {
-        const token = jwt.sign({ id: user._id, role: user.role, username: user.username }, process.env.JWT_SECRET, { expiresIn: '24h' });
-        res.json({ token, role: user.role, username: user.username });
+        const token = jwt.sign({ id: user._id, role: user.role, username: user.username }, process.env.JWT_SECRET, { expiresIn: '7d' });
+        const cookieOptions = {
+            httpOnly: false,
+            secure: true,
+            sameSite: 'none',
+            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        };
+        res
+            .cookie('token', token, cookieOptions)
+            .json({ role: user.role, username: user.username });
     } else {
         res.status(400).json({ message: 'Invalid credentials' });
     }
 };
+
+exports.logout = async (req, res) => {
+    res.clearCookie('token', {
+      httpOnly: false,
+      secure: true,
+      sameSite: 'none',
+    });
+    res.json({ message: 'Logged out successfully' });
+  };

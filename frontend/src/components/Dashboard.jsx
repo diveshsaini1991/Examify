@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-
+import Cookies from 'js-cookie';
 const Dashboard = () => {
     const [exams, setExams] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -14,12 +14,11 @@ const Dashboard = () => {
     }, []);
     
     const fetchExams = async () => {
-        const token = localStorage.getItem('token');
         try {
             setLoading(true);
             const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
             const response = await axios.get(VITE_BACKEND_URL + '/api/exams', {
-                headers: { Authorization: `Bearer ${token}` },
+                withCredentials: true
             });
             setExams(response.data);
             setError(null);
@@ -36,13 +35,12 @@ const Dashboard = () => {
             return;
         }
         
-        const token = localStorage.getItem('token');
         setDeleteLoading(examId);
         
         try {
             const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
             await axios.delete(VITE_BACKEND_URL + `/api/exams/delete/${examId}`, {
-                headers: { Authorization: `Bearer ${token}` },
+                withCredentials: true
             });
             
             // Remove the deleted exam from state

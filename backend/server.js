@@ -4,7 +4,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const certificateRoutes = require('./routes/certificate');
-
+const cookieparser = require("cookie-parser");
 
 
 dotenv.config();
@@ -13,10 +13,10 @@ connectDB();
 const app = express();
 
 app.use(cors({
-
     origin: process.env.FRONTEND_URL, 
-
+    credentials: true,
 }));
+app.use(cookieparser());
 app.use(express.json());
 app.use('/ping', (req, res) => {
     res.end("pong");

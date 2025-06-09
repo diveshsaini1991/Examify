@@ -18,7 +18,7 @@ const Auth = () => {
 
         try {
             const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-            const response = await axios.post(VITE_BACKEND_URL + `/api/auth${endpoint}`, { username, password, role });
+            const response = await axios.post(VITE_BACKEND_URL + `/api/auth${endpoint}`, { username, password, role }, { withCredentials: true });
             
             if (isRegistering) {
                 setSuccessMessage('Registration successful! You can now log in.');
@@ -27,7 +27,6 @@ const Auth = () => {
                     setSuccessMessage('');
                 }, 3000);
             } else {
-                localStorage.setItem('token', response.data.token);
                 localStorage.setItem('role', response.data.role);
                 localStorage.setItem('username', response.data.username);
 

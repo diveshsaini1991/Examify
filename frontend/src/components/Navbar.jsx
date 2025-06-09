@@ -1,5 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import Cookies from "js-cookie"
+import axios from 'axios';
 
 const Navbar = () => {
     const role = localStorage.getItem('role');
@@ -8,15 +10,17 @@ const Navbar = () => {
     
     const navigate = useNavigate();
     
-    const handleLogout = () => {
-        localStorage.removeItem('token');
+    const handleLogout = async() => {
+        const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+        await axios.post(VITE_BACKEND_URL + "/api/auth/logout" , {}, {
+            withCredentials: true
+          });
         localStorage.removeItem('role');
         localStorage.removeItem('username');
-
         navigate('/');
     };
     
-    if (!localStorage.getItem('token')) {
+    if (!Cookies.get('token')) {
         return null;
     }
 

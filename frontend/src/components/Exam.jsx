@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 const Exam = () => {
     const { id } = useParams();
@@ -19,6 +20,8 @@ const Exam = () => {
     const examContainerRef = useRef(null);
     const autoSubmitLock = useRef(false);
     const [examStarted, setExamStarted] = useState(false);
+
+    const token = Cookies.get('token');
     
     // Check if browser is in fullscreen
     const isFullscreen = () => {
@@ -69,11 +72,11 @@ const Exam = () => {
         autoSubmitLock.current = true;
         setIsSubmitting(true);
         try {
-            const token = localStorage.getItem('token');
             const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
             await axios.post(VITE_BACKEND_URL + '/api/exams/submit', 
-                { examId: id, answers }, 
-                { headers: { Authorization: `Bearer ${token}` } }
+                { examId: id, answers }, {
+                    withCredentials: true
+                }
             );
             setHasSubmitted(true);
             setShowEndExamPopup(true);
@@ -109,7 +112,7 @@ const Exam = () => {
                 setLoading(true);
                 const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
                 const response = await axios.get(VITE_BACKEND_URL + `/api/exams/${id}`, {
-                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                    withCredentials: true
                 });
                 
                 setExam(response.data);
@@ -156,11 +159,11 @@ const Exam = () => {
         autoSubmitLock.current = true;
         setIsSubmitting(true);
         try {
-            const token = localStorage.getItem('token');
             const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
             await axios.post(VITE_BACKEND_URL + '/api/exams/submit', 
-                { examId: id, answers }, 
-                { headers: { Authorization: `Bearer ${token}` } }
+                { examId: id, answers }, {
+                    withCredentials: true
+                }
             );
             setHasSubmitted(true);
             setShowEndExamPopup(true);

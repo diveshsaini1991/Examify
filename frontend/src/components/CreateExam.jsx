@@ -32,7 +32,7 @@ const CreateExam = () => {
         const token = localStorage.getItem('token');
         const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
         await axios.post(VITE_BACKEND_URL + '/api/exams', { title, questions }, {
-            headers: { Authorization: `Bearer ${token}` }
+            withCredentials: true
         });
         window.location.href = '/dashboard';
     };
