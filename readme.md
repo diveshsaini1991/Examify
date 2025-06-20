@@ -144,7 +144,7 @@ Demo link - will be here soon ...
 
 
 
-## Contributing to the MedHaven 🤝
+## Contributing to the Examify 🤝
 
 We welcome and appreciate contributions from the community to enhance and improve the Examify . Whether you're a developer, designer, tester, or someone with valuable feedback, your input is valuable.
 ## Thank You!❤️
